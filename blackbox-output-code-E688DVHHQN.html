@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheapFlights AI - Find the Best Deals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-form input, .search-form select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .search-form button {
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+        .filters {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        .filters select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .results {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .flight-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .flight-info {
+            flex: 1;
+        }
+        .flight-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .book-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .book-btn:hover {
+            background-color: #218838;
+        }
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            .flight-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CheapFlights AI</h1>
+        <p>Find the cheapest flight tickets powered by AI</p>
+    </header>
+    <div class="container">
+        <section class="search-section">
+            <form class="search-form" id="searchForm">
+                <input type="text" id="departure" placeholder="Departure City" required>
+                <input type="text" id="destination" placeholder="Destination City" required>
+                <input type="date" id="departureDate" required>
+                <input type="date" id="returnDate">
+                <button type="submit">Search Flights</button>
+            </form>
+            <div class="filters">
+                <select id="stops">
+                    <option value="">Any Stops</option>
+                    <option value="0">Non-stop</option>
+                    <option value="1">1 Stop</option>
+                    <option value="2">2+ Stops</option>
+                </select>
+                <select id="airlines">
+                    <option value="">Any Airline</option>
+                    <option value="Delta">Delta</option>
+                    <option value="American">American Airlines</option>
+                    <option value="United">United</option>
+                    <option value="Southwest">Southwest</option>
+                </select>
+                <label><input type="checkbox" id="flexibleDates"> Flexible Dates</label>
+            </div>
+        </section>
+        <section class="results" id="results">
+            <h2>Search Results</h2>
+            <div id="flightsList"></div>
+        </section>
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const departure = document.getElementById('departure').value;
+            const destination = document.getElementById('destination').value;
+            const departureDate = document.getElementById('departureDate').value;
+            const returnDate = document.getElementById('returnDate').value;
+            const stops = document.getElementById('stops').value;
+            const airlines = document.getElementById('airlines').value;
+            const flexible = document.getElementById('flexibleDates').checked;
+
+            // Simulate AI fetching cheapest flights (mock data)
+            const flights = generateMockFlights(departure, destination, stops, airlines, flexible);
+
+            displayFlights(flights);
+            document.getElementById('results').style.display = 'block';
+        });
+
+        function generateMockFlights(departure, destination, stops, airlines, flexible) {
+            const airlinesList = ['Delta', 'American Airlines', 'United', 'Southwest', 'JetBlue'];
+            const flights = [];
+            for (let i = 0; i < 5; i++) {
+                const airline = airlines ? airlines : airlinesList[Math.floor(Math.random() * airlinesList.length)];
+                const price = Math.floor(Math.random() * 500) + 200;
+                const depTime = `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
+                const arrTime = `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
+                const duration = `${Math.floor(Math.random() * 10) + 2}h ${Math.floor(Math.random() * 60)}m`;
+                const numStops = stops ? parseInt(stops) : Math.floor(Math.random() * 3);
+                flights.push({ airline, price, depTime, arrTime, duration, numStops });
+            }
+            return flights.sort((a, b) => a.price - b.price); // Sort by price
+        }
+
+        function displayFlights(flights) {
+            const flightsList = document.getElementById('flightsList');
+            flightsList.innerHTML = '';
+            flights.forEach(flight => {
+                const card = document.createElement('div');
+                card.className = 'flight-card';
+                card.innerHTML = `
+                    <div class="flight-info">
+                        <h3>${flight.airline}</h3>
+                        <p>Departure: ${flight.depTime} | Arrival: ${flight.arrTime}</p>
+                        <p>Duration: ${flight.duration} | Stops: ${flight.numStops}</p>
+                    </div>
+                    <div>
+                        <div class="flight-price">$${flight.price}</div>
+                        <button class="book-btn">Book Now</button>
+                    </div>
+                `;
+                flightsList.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
